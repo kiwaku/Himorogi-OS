@@ -82,15 +82,19 @@ Script exits via kernel shutdown; if persistence partition is in use, its overla
 ## Build & Reproduce
 
 ```bash
-git clone git@github.com:[your‑name]/Himorogi-OS.git
+git clone git@github.com:kiwaku/Himorogi-OS.git
 cd Himorogi-OS
 sudo ./build_iso.sh     # outputs himorogi-fixed.iso
+```
+---
 
 ## Dependencies
 
 binutils debootstrap squashfs-tools xorriso
 isolinux syslinux-utils grub-pc-bin grub-efi-amd64-bin
 mtools dosfstools qemu-system-x86 ovmf
+
+---
 
 ## Future compatability
 
