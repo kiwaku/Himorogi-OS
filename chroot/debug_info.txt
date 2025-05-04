@@ -1,0 +1,232 @@
+--- Debug Information Gatherer ---
+Timestamp: Sat May  3 20:44:12 UTC 2025
+
+--- Checking Modified Scripts ---
+--- /usr/local/bin/himorogi.sh ---
+-rwxr-xr-x 1 root root 1223 May  3 20:01 /usr/local/bin/himorogi.sh
+#!/bin/bash
+clear
+echo -e "\e[1;35mWelcome to Himorogi — Terminal OS for Recon and Peace\e[0m"
+echo "System  (5.15.0-138-generic)"
+echo "Running live from RAM (changes are ephemeral unless saved to persistent storage)"
+echo "Login user: $(whoami)" # Escaped $
+# Add NetworkManager status if available
+if command -v nmcli >/dev/null 2>&1; then
+  echo "Network Status:"
+  nmcli general status
+  nmcli device status
+else
+  echo "Network Status (use 'ip a' or 'ifconfig'):"
+  ip a | grep 'state UP' # Basic check for up interfaces
+fi
+echo ""
+
+# Start tmux session with predefined layout
+tmux new-session -d -s himorogi \; \
+  send-keys -t himorogi:0 'echo "Main Shell"; echo "Networking:"; ip a; echo ""; echo "Try: nmcli dev wifi list (if wifi detected)"; bash' C-m \; \
+  rename-window -t himorogi:0 'Main' \; \
+  new-window -t himorogi -n 'Scripts' \; \
+  send-keys -t himorogi:1 'cd /root/scripts; ls -la; echo ""; echo "Available helper scripts: proxy_select.sh, mount_usb.sh, wipe_and_exit.sh"; bash' C-m \; \
+  new-window -t himorogi -n 'Files' \; \
+  send-keys -t himorogi:2 'cd /root; ls -la; echo ""; echo "Check /captures and /notes"; bash' C-m \; \
+  select-window -t himorogi:0 \; \
+  attach-session -t himorogi
+---------------------------------
+
+--- /usr/local/bin/wipe_and_exit.sh ---
+-rwxr-xr-x 1 root root 1755 May  3 20:03 /usr/local/bin/wipe_and_exit.sh
+#!/bin/bash
+# /usr/local/bin/wipe_and_exit.sh
+# Run this script with sudo or as root for full effect.
+
+echo "INFO: Starting secure wipe and shutdown process..."
+
+# Check if running as root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "WARNING: Not running as root. Some system logs may not be cleared."
+  echo "Attempting user-level cleanup..."
+fi
+
+# --- File System Wiping ---
+echo "INFO: Wiping volatile user and system directories..."
+
+# User-specific files (use find to handle non-existent files gracefully)
+# Add other user-specific files/dirs if needed
+
+# Root user history
+rm -f /root/.bash_history
+rm -f /root/.viminfo
+
+# Common temporary locations
+rm -rf /tmp/* /var/tmp/*
+
+# System logs (requires root/sudo)
+# Standard logs - may not exist if journald is primary, but good to clear
+rm -rf /var/log/*.log /var/log/syslog /var/log/messages /var/log/auth.log
+rm -rf /var/log/apt/* /var/log/dpkg.log
+# Journald logs (if journald wasn't disabled/masked during build)
+# Consider running 'journalctl --rotate && journalctl --vacuum-time=1s' before removing
+rm -rf /var/log/journal/*
+# Other potential log/backup locations
+rm -rf /var/backups/*
+
+echo "INFO: Volatile directories wiped."
+
+# --- Shell History ---
+echo "INFO: Clearing current shell history..."
+history -c # Clear history for the *current* shell instance running the script
+
+# If run as user 'kar-a, also try clearing their history buffer (may be redundant)
+fi
+
+
+# --- Sync Filesystem ---
+echo "INFO: Syncing filesystem buffers..."
+sync; sync; sync
+
+# --- Final Shutdown ---
+echo "INFO: Wipe complete. Powering off NOW."
+sleep 2
+
+# Force immediate poweroff
+# Use poweroff -f or systemctl poweroff --force --no-wall
+poweroff -f
+
+exit 0 # Exit script cleanly (though poweroff usually prevents this)
+-------------------------------------
+
+--- Checking Relocated Scripts Location (/root/scripts) ---
+--- Directory Listing: /root/scripts ---
+total 16
+drwxr-x--- 2 root root 4096 May  3 20:03 .
+drwx------ 5 root root 4096 May  3 20:03 ..
+-rwxr-x--x 1 root root 1638 May  2 11:53 mount_usb.sh
+-rwxr-x--x 1 root root  963 May  2 11:52 proxy_select.sh
+--- Contents of scripts in /root/scripts ---
+/root/scripts/mount_usb.sh
+--- Content of /root/scripts/mount_usb.sh ---
+#!/bin/bash
+echo "Available block devices (potential USB drives):"
+lsblk -d -o NAME,SIZE,MODEL | grep -vE 'loop|sr|nvme|sda$' # Basic filter
+echo ""
+read -p "Enter device NAME to mount (e.g., sdb1, sdc1): " dev
+if [ -z "$dev" ]; then
+  echo "No device entered. Exiting."
+  exit 1
+fi
+if [ ! -b "/dev/$dev" ]; then
+  echo "Error: Device /dev/$dev not found or is not a block device."
+  exit 1
+fi
+# Try mounting common filesystems
+MOUNT_POINT="/mnt/usb_$(basename $dev)"
+mkdir -p "$MOUNT_POINT"
+echo "Attempting to mount /dev/$dev at $MOUNT_POINT..."
+if mount -o ro "/dev/$dev" "$MOUNT_POINT"; then # Mount read-only first
+  echo "Successfully mounted /dev/$dev (read-only) at $MOUNT_POINT"
+  echo "Filesystem type: $(lsblk -f -n -o FSTYPE /dev/$dev)"
+  echo "To unmount: sudo umount $MOUNT_POINT"
+elif mount -t ntfs-3g -o ro "/dev/$dev" "$MOUNT_POINT"; then # Try NTFS
+  echo "Successfully mounted /dev/$dev (NTFS, read-only) at $MOUNT_POINT"
+  echo "To unmount: sudo umount $MOUNT_POINT"
+else
+   echo "Error mounting /dev/$dev. Common filesystem types (ext4, vfat, ntfs) failed or device is already mounted."
+   rmdir "$MOUNT_POINT" 2>/dev/null
+   exit 1
+fi
+read -p "Mount read-write? (Requires filesystem support) [y/N]: " remount_rw
+if [[ "$remount_rw" =~ ^[Yy]$ ]]; then
+  if umount "$MOUNT_POINT" && mount "/dev/$dev" "$MOUNT_POINT"; then
+    echo "Remounted read-write at $MOUNT_POINT."
+  else
+    echo "Failed to remount read-write. Keeping read-only mount."
+    # Re-attempt read-only mount just in case
+    mount -o ro "/dev/$dev" "$MOUNT_POINT" 2>/dev/null || mount -t ntfs-3g -o ro "/dev/$dev" "$MOUNT_POINT" 2>/dev/null
+  fi
+fi
+--- End of /root/scripts/mount_usb.sh ---
+/root/scripts/proxy_select.sh
+--- Content of /root/scripts/proxy_select.sh ---
+#!/bin/bash
+echo "Select proxy routing:"
+echo "[1] Direct Connection (Default)"
+echo "[2] Tor (via torsocks prefix)"
+echo "[3] Proxychains (Edit /etc/proxychains.conf first)"
+read -p "Choice [1]: " choice
+case "" in
+  1)
+    unset ALL_PROXY HTTP_PROXY HTTPS_PROXY FTP_PROXY SOCKS_PROXY
+    echo "Proxy environment variables unset. Connection is direct."
+    ;;
+  2)
+    echo "Tor selected. Prefix commands needing Tor with 'torsocks'."
+    echo "Example: torsocks curl https://check.torproject.org/"
+    ;;
+  3)
+    if [ -f /etc/proxychains.conf ]; then
+      echo "Proxychains selected. Prefix commands with 'proxychains4'."
+      echo "Example: proxychains4 curl ifconfig.me"
+      echo "Ensure /etc/proxychains.conf is configured correctly."
+    else
+      echo "Error: /etc/proxychains.conf not found."
+    fi
+    ;;
+  *)
+    unset ALL_PROXY HTTP_PROXY HTTPS_PROXY FTP_PROXY SOCKS_PROXY
+    echo "Invalid choice or default. Connection is direct."
+    ;;
+esac
+--- End of /root/scripts/proxy_select.sh ---
+---------------------------------------
+
+--- Checking Root's Bash Configuration ---
+--- /root/.bashrc ---
+-rw-r--r-- 1 root root 907 May  3 20:19 /root/.bashrc
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+# Note: PS1 and umask are already set in /etc/profile. You should not
+# need this unless you want different defaults for root.
+# PS1='${debian_chroot:+($debian_chroot)}\h:\w\$ '
+# umask 022
+
+# You may uncomment the following lines if you want `ls' to be colorized:
+# export LS_OPTIONS='--color=auto'
+# eval "$(dircolors)"
+# alias ls='ls $LS_OPTIONS'
+# alias ll='ls $LS_OPTIONS -l'
+# alias l='ls $LS_OPTIONS -lA'
+#
+# Some more alias to avoid making mistakes:
+# alias rm='rm -i'
+# alias cp='cp -i'
+# alias mv='mv -i'
+
+# Launch Himorogi tmux session on login if not already running
+# Check we are on a virtual console (tty1-6) and not in X or ssh etc.
+if [[ -z "$TMUX" ]] && [[ "$(tty)" =~ /dev/tty[0-9]+$ ]]; then
+  /usr/local/bin/himorogi.sh
+fi
+
+# Custom root prompt
+PS1='\[\e[1;31m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\# ' # Use \# for root prompt
+---------------------
+
+--- Checking User/Group Files for 'kara' ---
+--- grep 'kara' /etc/passwd ---
+No 'kara' found in /etc/passwd.
+-------------------------------
+--- grep 'kara' /etc/shadow ---
+No 'kara' found in /etc/shadow.
+-------------------------------
+--- grep 'kara' /etc/group ---
+No 'kara' found in /etc/group.
+------------------------------
+--- grep 'kara' /etc/gshadow ---
+No 'kara' found in /etc/gshadow.
+--------------------------------
+
+--- Checking /root directory permissions ---
+drwx------ 5 root root 4096 May  3 20:03 /root
+------------------------------------------
+
+--- Debug Information Gathering Complete ---

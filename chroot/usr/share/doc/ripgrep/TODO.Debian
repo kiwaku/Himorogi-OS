@@ -1,0 +1,4 @@
+* enable pcre ( https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=926333 )
+* enable jemallocator when accepted in debian
+
+ -- Sylvestre Ledru <sylvestre@debian.org>  Sun, 01 Dec 2019 11:57:07 +0100

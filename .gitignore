@@ -1,0 +1,21 @@
+# Final ISO image and other build artifacts
+*.iso
+*.img
+*.squ
+*.log
+*.tmp
+
+# Live-build outputs (auto-generated)
+iso/live/filesystem.squashfs
+iso/live/initrd.img
+iso/live/vmlinuz
+
+# Runtime pseudo-filesystems inside chroot
+chroot/dev/
+chroot/proc/
+chroot/sys/
+chroot/tmp/
+chroot/run/
+
+# APT cache (optional cleanup)
+chroot/var/cache/apt/archives/

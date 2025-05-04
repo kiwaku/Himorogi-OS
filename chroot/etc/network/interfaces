@@ -1,0 +1,14 @@
+# Loopback
+auto lo
+iface lo inet loopback
+
+# Interfaces managed by NetworkManager or manually via ip/ifup/wpa_supplicant
+# Remove or comment out specific eth* or wlan* entries if using NetworkManager primarily
+# allow-hotplug eth0
+# iface eth0 inet dhcp
+# allow-hotplug en*
+# iface en* inet dhcp
+# allow-hotplug wlan0
+# iface wlan0 inet dhcp
+# allow-hotplug wl*
+# iface wl* inet dhcp

@@ -1,0 +1,10 @@
+4fe37d4aadfb9bdee18f7f9a06ca4c9a  usr/lib/x86_64-linux-gnu/libbind9-9.18.33-1~deb12u2-Debian.so
+8de716b38787a4d3323917c615f2a303  usr/lib/x86_64-linux-gnu/libdns-9.18.33-1~deb12u2-Debian.so
+8dd888735b7d71ef56f95069095a5469  usr/lib/x86_64-linux-gnu/libirs-9.18.33-1~deb12u2-Debian.so
+485b2623d64eed189545b7c94903cf31  usr/lib/x86_64-linux-gnu/libisc-9.18.33-1~deb12u2-Debian.so
+cd5c79afdaef6fdfc41973c850060205  usr/lib/x86_64-linux-gnu/libisccc-9.18.33-1~deb12u2-Debian.so
+7166f3338e140604516a8f2d0082094b  usr/lib/x86_64-linux-gnu/libisccfg-9.18.33-1~deb12u2-Debian.so
+d2b00f40b0cd7d9d49ee6c065801e3e7  usr/lib/x86_64-linux-gnu/libns-9.18.33-1~deb12u2-Debian.so
+e929d74c0579a2445bdfb8b02a7657c3  usr/share/doc/bind9-libs/changelog.Debian.gz
+87d36bb6374958d7dfd3db0dcc7a6253  usr/share/doc/bind9-libs/copyright
+5a8db1f2385c80b7537a5614f81d6e26  usr/share/lintian/overrides/bind9-libs

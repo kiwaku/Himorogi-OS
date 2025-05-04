@@ -1,0 +1,9 @@
+auto
+/usr/bin/proxychains
+proxychains.1.gz
+/usr/share/man/man1/proxychains.1.gz
+
+/usr/bin/proxychains3
+300
+/usr/share/man/man1/proxychains3.1.gz
+

@@ -1,0 +1,14 @@
+/.
+/usr
+/usr/lib
+/usr/lib/proxychains3
+/usr/lib/proxychains3/proxyresolv
+/usr/lib/x86_64-linux-gnu
+/usr/lib/x86_64-linux-gnu/libproxychains.so.3.0.0
+/usr/share
+/usr/share/doc
+/usr/share/doc/libproxychains3
+/usr/share/doc/libproxychains3/changelog.Debian.gz
+/usr/share/doc/libproxychains3/changelog.gz
+/usr/share/doc/libproxychains3/copyright
+/usr/lib/x86_64-linux-gnu/libproxychains.so.3

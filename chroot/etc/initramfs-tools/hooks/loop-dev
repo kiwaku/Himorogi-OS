@@ -1,0 +1,17 @@
+#!/bin/sh
+PREREQ=""
+prereqs() { echo "$PREREQ"; }
+
+case "$1" in
+  prereqs) prereqs; exit 0 ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+# Ensure loop module is included
+manual_add_modules loop
+
+# Ensure a loop device node is present (needed early in boot)
+mkdir -p "${DESTDIR}/dev"
+mknod -m 660 "${DESTDIR}/dev/loop0" b 7 0
+chown root:disk "${DESTDIR}/dev/loop0"

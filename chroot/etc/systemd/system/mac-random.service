@@ -1,0 +1,11 @@
+[Unit]
+Description=Randomise MAC addresses before network-up
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/randomise_mac.sh
+
+[Install]
+WantedBy=multi-user.target

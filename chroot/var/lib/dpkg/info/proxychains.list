@@ -1,0 +1,15 @@
+/.
+/etc
+/etc/proxychains.conf
+/usr
+/usr/bin
+/usr/bin/proxychains3
+/usr/share
+/usr/share/doc
+/usr/share/doc/proxychains
+/usr/share/doc/proxychains/changelog.Debian.gz
+/usr/share/doc/proxychains/changelog.gz
+/usr/share/doc/proxychains/copyright
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/proxychains3.1.gz

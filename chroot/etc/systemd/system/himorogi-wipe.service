@@ -1,0 +1,12 @@
+[Unit]
+Description=Secure wipe on shutdown
+DefaultDependencies=no
+Before=poweroff.target reboot.target halt.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wipe_and_exit.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=poweroff.target reboot.target halt.target

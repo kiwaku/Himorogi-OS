@@ -1,0 +1,9 @@
+856f408eb12d7a237ff97a88c395e4a2  usr/bin/rg
+550296682d98fe8222014426c2dd628d  usr/share/bash-completion/completions/rg
+536668671f52e8e32f9f607aa4b70816  usr/share/doc/ripgrep/TODO.Debian
+7c924ce80fd8384a8a96d645f146922a  usr/share/doc/ripgrep/changelog.Debian.amd64.gz
+9e032ddcff2431a3f88730ff30aeb806  usr/share/doc/ripgrep/changelog.Debian.gz
+c387d89d29f597e525ea9d0956cd41c7  usr/share/doc/ripgrep/changelog.gz
+f78c0f9ef0e769e9929d5e942a11ca02  usr/share/doc/ripgrep/copyright
+dc8dfecd217edadca0a4afb53daaf6e2  usr/share/man/man1/rg.1.gz
+7d274f4cd16b398d1b72173ebbf5c492  usr/share/zsh/vendor-completions/_rg
